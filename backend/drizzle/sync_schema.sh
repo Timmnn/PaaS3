@@ -1,0 +1,1 @@
+drizzle-kit generate && drizzle-kit migrate

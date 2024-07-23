@@ -1,4 +1,4 @@
-<script>
+<script lang="typescript">
 	import { Button } from 'flowbite-svelte';
 	export let data;
 </script>
@@ -16,6 +16,7 @@
 				<h2>{project.name}</h2>
 				<p>{project.description}</p>
 				<p>Health: <span class={'healthc-circle ' + project.health}></span></p>
+				<a href={'http://' + project.domain} target="_blank">{project.domain}</a>
 			</div>
 		</a>
 	{/each}

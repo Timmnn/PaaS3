@@ -125,6 +125,8 @@ const getProjects = publicProcedure.query(async (): ApiResponse<GetProjectsRespo
 		};
 	}
 
+	console.log('getting projects');
+
 	const projects = await db.select().from(schema.projects);
 
 	const healthchecks = projects.map(async (project) => {

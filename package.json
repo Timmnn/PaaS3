@@ -2,7 +2,7 @@
   "name": "paas",
   "version": "0.0.1",
   "scripts": {
-    "dev": "concurrently --kill-others \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:nginx\"",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:nginx\"",
     "dev:frontend": "vite dev --host --port 3000",
     "dev:nginx": "bash ./start-nginx.sh",
     "dev:backend": "concurrently --kill-others \"bun run --watch backend/server/main.ts\" \"npm run dev:backend:docker\"",

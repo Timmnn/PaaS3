@@ -34,6 +34,9 @@ entryPoints:
     #       scheme: https
   websecure:
     address: :443
+
+  webui:
+    address: :8000
   # -- (Optional) Add custom Entrypoint
   # custom:
   #   address: :8080

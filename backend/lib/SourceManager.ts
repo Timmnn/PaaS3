@@ -9,8 +9,16 @@ config({
 
 export default class SourceManager {
 	// sourceUrl: URL to the source (git repo, zip file, etc)
-	async pullSource({ type, sourceUrl }: { type: project_sources; sourceUrl: string }) {
-		const dirName = this.getDirName({ sourceUrl });
+	async pullSource({
+		type,
+		sourceUrl,
+		project_id
+	}: {
+		type: project_sources;
+		sourceUrl: string;
+		project_id: number;
+	}) {
+		const dirName = this.getDirName({ project_id });
 		if (!fs.existsSync(dirName)) {
 			fs.mkdirSync(dirName);
 		}
@@ -27,13 +35,8 @@ export default class SourceManager {
 		return dirName;
 	}
 
-	private getDirName({ sourceUrl }: { sourceUrl: string }) {
-		const random_pull_id = Math.random().toString(36).substring(7);
-		return (
-			process.env.PRIVATE_DEPLOYMENTS_FOLDER +
-			sourceUrl.replace(/[^a-zA-Z0-9]/g, '') +
-			random_pull_id
-		);
+	getDirName({ project_id }: { project_id: number }) {
+		return `deployments/${project_id}`;
 	}
 
 	private pullGit({ dirName, sourceUrl }: { dirName: string; sourceUrl: string }) {

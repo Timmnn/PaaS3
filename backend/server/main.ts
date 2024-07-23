@@ -10,7 +10,6 @@ import { type InferSelectModel, eq } from 'drizzle-orm';
 import NginxManager from '../lib/NginxManager';
 import SourceManager from '../lib/SourceManager';
 import DeploymentManager from '../lib/DeploymentManager';
-import axios from 'axios';
 
 const nginxManager = new NginxManager();
 const sourceManager = new SourceManager();
@@ -33,6 +32,10 @@ interface ErrorResponse {
 }
 
 type ApiResponse<T> = Promise<SuccessResponse<T> | ErrorResponse>;
+
+type ProjectWithHealth = InferSelectModel<typeof schema.projects> & {
+	health: HealthcheckResponse;
+};
 
 // ---------------------
 // tRPC
@@ -72,7 +75,7 @@ async function useDb(): Promise<ReturnType<typeof drizzle> | null> {
 
 const getProject = publicProcedure
 	.input(z.number().refine((id) => id > 0, { message: 'Invalid project id' }))
-	.query(async (opts): ApiResponse<InferSelectModel<typeof schema.projects>> => {
+	.query(async (opts): ApiResponse<ProjectWithHealth> => {
 		const id = opts.input;
 		const db = await useDb();
 		if (!db) {
@@ -96,34 +99,52 @@ const getProject = publicProcedure
 			};
 		}
 
+		const health = await getProjectHealthFunction(projects[0]);
+
+		const project = {
+			...projects[0],
+			health
+		};
+
 		return {
 			success: true,
-			data: projects[0]
+			data: project
 		};
 	});
 
-const getProjects = publicProcedure.query(
-	async (): ApiResponse<InferSelectModel<typeof schema.projects>[]> => {
-		console.log('getProjects');
-		const db = await useDb();
-		if (!db) {
-			return {
-				success: false,
-				error: {
-					code: 500,
-					message: 'Failed to connect to database'
-				}
-			};
-		}
-
-		const projects = await db.select().from(schema.projects);
-
+type GetProjectsResponse = ProjectWithHealth[];
+const getProjects = publicProcedure.query(async (): ApiResponse<GetProjectsResponse> => {
+	const db = await useDb();
+	if (!db) {
 		return {
-			success: true,
-			data: projects
+			success: false,
+			error: {
+				code: 500,
+				message: 'Failed to connect to database'
+			}
 		};
 	}
-);
+
+	const projects = await db.select().from(schema.projects);
+
+	const healthchecks = projects.map(async (project) => {
+		return await getProjectHealthFunction(project.id);
+	});
+
+	const healthchecksResolved = await Promise.all(healthchecks);
+
+	const projects_with_health = projects.map((project) => ({
+		...project,
+		health: healthchecksResolved[project.id]
+	}));
+
+	console.log('projects_with_health', projects_with_health);
+
+	return {
+		success: true,
+		data: projects_with_health
+	};
+});
 
 const createProject = publicProcedure
 	.input(
@@ -185,7 +206,8 @@ const createProject = publicProcedure
 
 		const source_folder = await sourceManager.pullSource({
 			type: 'public-git',
-			sourceUrl: opts.input.git_repo_url
+			sourceUrl: opts.input.git_repo_url,
+			project_id: project.id
 		});
 
 		const exposed_ports = await deploymentManager.deployProject(project, source_folder);
@@ -198,9 +220,10 @@ const createProject = publicProcedure
 		};
 	});
 
+type HealthcheckResponse = 'running' | 'stopped';
 const getProjectHealth = publicProcedure
 	.input(z.number().refine((id) => id > 0, { message: 'Invalid project id' }))
-	.query(async (opts): ApiResponse<'running' | 'stopped'> => {
+	.query(async (opts): ApiResponse<HealthcheckResponse> => {
 		const db = await useDb();
 		if (!db) {
 			return {
@@ -226,28 +249,70 @@ const getProjectHealth = publicProcedure
 			};
 		}
 
-		// check if the project is running
-
-		const { healthcheck_url, domain } = project;
-
-		// check if the project is running
-
-		console.log('healthcheck', `http://${domain}${healthcheck_url}`);
-		const response = await fetch(`http://${domain}${healthcheck_url}`).catch((e) => {
-			console.error('healthcheck failed', e);
-			return null;
-		});
-
-		if (response?.status === 200) {
-			return {
-				success: true,
-				data: 'running'
-			};
+		let state = 'stopped';
+		try {
+			state = await getProjectHealthFunction(project);
+		} catch (e) {
+			console.error('Failed to check health', e);
+			state = 'stopped';
 		}
 
 		return {
 			success: true,
-			data: 'stopped'
+			data: state as HealthcheckResponse
+		};
+	});
+
+async function getProjectHealthFunction(
+	project: InferSelectModel<typeof schema.projects>
+): Promise<HealthcheckResponse> {
+	const { domain, healthcheck_url } = project;
+	return await fetch(`http://${domain}${healthcheck_url}`)
+		.then((response) => {
+			if (response.status === 200) {
+				return 'running' as const;
+			}
+
+			return 'stopped' as const;
+		})
+		.catch(() => {
+			return 'stopped' as const;
+		});
+}
+
+const startProject = publicProcedure
+	.input(z.number().refine((id) => id > 0, { message: 'Invalid project id' }))
+	.mutation(async (opts): ApiResponse<void> => {
+		const db = await useDb();
+		if (!db) {
+			return {
+				success: false,
+				error: {
+					code: 500,
+					message: 'Failed to connect to database'
+				}
+			};
+		}
+
+		const project = (
+			await db.select().from(schema.projects).where(eq(schema.projects.id, opts.input))
+		)[0];
+
+		if (!project) {
+			return {
+				success: false,
+				error: {
+					code: 404,
+					message: 'Project not found'
+				}
+			};
+		}
+
+		await deploymentManager.startProject(sourceManager.getDirName({ project_id: project.id }));
+
+		return {
+			success: true,
+			data: void 0
 		};
 	});
 
@@ -259,7 +324,8 @@ const appRouter = router({
 	getProject,
 	getProjects,
 	createProject,
-	getProjectHealth
+	getProjectHealth,
+	startProject
 });
 
 export type AppRouter = typeof appRouter;

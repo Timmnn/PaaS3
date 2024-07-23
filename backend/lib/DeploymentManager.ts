@@ -91,4 +91,22 @@ export default class DeploymentManager {
 			});
 		});
 	}
+
+	async startProject(source_folder: string) {
+		console.log('starting project', source_folder);
+		const deployScript = `docker-compose -f ${source_folder}/edited-docker-compose.yml up -d `;
+
+		const process = exec(deployScript, (error, stdout, stderr) => {
+			if (error) {
+				console.error(`exec error: ${error}`);
+				return;
+			}
+			console.log(`stdout: ${stdout}`);
+			console.error(`stderr: ${stderr}`);
+		});
+
+		process.on('exit', (code) => {
+			console.log(`Child process exited with code ${code}`);
+		});
+	}
 }

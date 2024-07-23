@@ -6,7 +6,7 @@
     "dev:frontend": "vite dev --host --port 3000",
     "dev:nginx": "bash ./start-nginx.sh",
     "dev:backend": "concurrently --kill-others \"bun run --watch backend/server/main.ts\" \"npm run dev:backend:docker\"",
-    "dev:backend:docker": "docker-compose up",
+    "dev:backend:docker": "docker compose up",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",

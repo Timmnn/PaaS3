@@ -1,4 +1,4 @@
-apt install unzip nodejs npm -y
+apt install unzip nodejs npm nginx -y
 curl -fsSL https://bun.sh/install | bash
 bun install
 npm i -g concurrently

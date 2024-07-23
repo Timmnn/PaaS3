@@ -1,38 +1,27 @@
-# create-svelte
+# Deplauto
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+## What is it?
 
-## Creating a project
+Deplauto is an open source self hosted alternative to Vercel or Heroku. It allows you to host any database, webapp or server in seconds using the Web UI, the CLI or the API.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Roadmap
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+[x] One Step Installation
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+[ ] Automatic https
 
-## Developing
+[ ] CLI
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+[x] Healthchecks
 
-```bash
-npm run dev
+[ ] Environment Variables
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+[ ] Automatic Redeploy on Git Commit
 
-## Building
+[ ] Multiple Deployments (Prod, Staging, ...) per project
 
-To create a production version of your app:
+[ ] ...
 
-```bash
-npm run build
-```
+## Installation
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+git clone https://github.com/Timmnn/PaaS3.git && cd PaaS3 && bash ./install.sh

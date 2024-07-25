@@ -4,23 +4,37 @@
 
 Deplauto is an open source self hosted alternative to Vercel or Heroku. It allows you to host any database, webapp or server in seconds using the Web UI, the CLI or the API.
 
-## Roadmap
+## Roadmap / To Do
 
-[x] One Step Installation
+[-] One Step Installation
 
 [ ] Automatic https
 
 [ ] CLI
 
-[x] Healthchecks
-
-[ ] Environment Variables
+[-] Environment Variables
 
 [ ] Automatic Redeploy on Git Commit
 
 [ ] Multiple Deployments (Prod, Staging, ...) per project
 
-[ ] ...
+[ ] Configuring Healthcheck Settings (Expected Body and Status Code)
+
+[ ] Deleting Projects
+
+[ ] Modifying Project Settings
+
+[ ] Prevent Multiple Projects on same Domain and Port
+
+[ ] Add Status Alerts for Failed and Succeded API-Calls (For example to notify the user, when the project creation failed/succeded)
+
+[ ] Email Notifications, on Project crash
+
+[ ] Premade Services
+
+### Done
+
+[x] Healthchecks
 
 ## Installation
 

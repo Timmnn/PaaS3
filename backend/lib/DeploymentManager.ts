@@ -44,11 +44,14 @@ export default class DeploymentManager {
       - "traefik.http.routers.server.rule=Host(`example.com`)"
       - "traefik.http.routers.server.entrypoints=web"
 				*/
+
+				const router_name = `router-${project.domain.replace(/\./g, '-')}`;
+
 				docker_compose_config.services[port_80_service].labels = [
 					'traefik.enable=true',
-					`traefik.http.routers.server.rule=Host(\`${project.domain}\`)`,
-					'traefik.http.routers.server.entrypoints=web',
-					'traefik.http.services.server.loadbalancer.server.port=80'
+					`traefik.http.routers.${router_name}.rule=Host(\`${project.domain}\`)`,
+					`traefik.http.routers.${router_name}.entrypoints=web`,
+					`traefik.http.services.${router_name}.loadbalancer.server.port=80`
 				];
 				// add traefik network
 				if (!docker_compose_config.networks) {

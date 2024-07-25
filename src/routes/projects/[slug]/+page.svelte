@@ -48,7 +48,7 @@
 				return;
 			}
 
-			window.location.href = '/projects';
+			window.location.href = '/';
 		});
 	}
 
@@ -72,8 +72,8 @@ RUNNING: {data.project.health === 'running' ? 'YES' : 'NO'}
 				<br />
 				This action cannot be undone.
 			</h3>
-			<Button color="red" class="me-2">Yes, I'm sure</Button>
-			<Button color="alternative" on:click={deleteProject}>No, cancel</Button>
+			<Button color="red" class="me-2" on:click={deleteProject}>Yes, I'm sure</Button>
+			<Button color="alternative">No, cancel</Button>
 		</div>
 	</Modal>
 

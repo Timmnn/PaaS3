@@ -6,15 +6,17 @@ import getProjects from './routes/getProjects';
 import createProject from './routes/createProject';
 import getProjectHealth from './routes/getProjectHealth';
 import startProject from './routes/startProject';
+import deleteProject from './routes/deleteProject';
 import { router, createContext } from './router';
-import trpcExpress from '@trpc/server/adapters/express';
+import { createExpressMiddleware } from '@trpc/server/adapters/express';
 
 const appRouter = router({
 	getProject,
 	getProjects,
 	createProject,
 	getProjectHealth,
-	startProject
+	startProject,
+	deleteProject
 });
 
 export type AppRouter = typeof appRouter;
@@ -26,7 +28,7 @@ const PORT = 3001;
 
 app.use(
 	'/trpc',
-	trpcExpress.createExpressMiddleware({
+	createExpressMiddleware({
 		router: appRouter,
 		createContext
 	})

@@ -112,4 +112,25 @@ export default class DeploymentManager {
 			console.log(`Child process exited with code ${code}`);
 		});
 	}
+
+	stopProject({ project_id }: { project_id: number }) {
+		return new Promise<void>((resolve, reject) => {
+			const proc = exec(
+				`docker-compose -f deployments/${project_id}/edited-docker-compose.yml down`,
+				(error, stdout, stderr) => {
+					if (error) {
+						console.error(`exec error: ${error}`);
+						return;
+					}
+					console.log(`stdout: ${stdout}`);
+					console.error(`stderr: ${stderr}`);
+				}
+			);
+
+			proc.on('exit', (code) => {
+				console.log(`Child process exited with code ${code}`);
+				resolve();
+			});
+		});
+	}
 }

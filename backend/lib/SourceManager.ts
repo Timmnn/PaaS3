@@ -39,6 +39,14 @@ export default class SourceManager {
 		return `deployments/${project_id}`;
 	}
 
+	deleteProject({ project_id }: { project_id: number }) {
+		const dirName = this.getDirName({ project_id });
+
+		if (fs.existsSync(dirName)) {
+			fs.rmdirSync(dirName, { recursive: true });
+		}
+	}
+
 	private pullGit({ dirName, sourceUrl }: { dirName: string; sourceUrl: string }) {
 		return new Promise<void>((resolve, reject) => {
 			console.log('cloning git repo', dirName);

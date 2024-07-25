@@ -13,6 +13,7 @@ const deploymentManager = new DeploymentManager();
 const deleteProject = publicProcedure
 	.input(z.number().refine((id) => id > 0, { message: 'Invalid project id' }))
 	.mutation(async (opts): ApiResponse<void> => {
+		console.log('deleteProject');
 		const db = await useDb();
 		if (!db) {
 			return {
@@ -24,21 +25,30 @@ const deleteProject = publicProcedure
 			};
 		}
 
-		const project = (
-			await db.select().from(schema.projects).where(eq(schema.projects.id, opts.input))
-		)[0];
+		db.transaction(async (tx) => {
+			await tx
+				.delete(schema.project_env_variables)
+				.where(eq(schema.project_env_variables.project_id, opts.input));
 
-		if (!project) {
-			return {
-				success: false,
-				error: {
-					code: 404,
-					message: 'Project not found'
-				}
-			};
-		}
+			const deleted_proj = await tx
+				.delete(schema.projects)
+				.where(eq(schema.projects.id, opts.input))
+				.returning();
 
-		await deploymentManager.startProject(sourceManager.getDirName({ project_id: project.id }));
+			if (!deleted_proj.length) {
+				return {
+					success: false,
+					error: {
+						code: 404,
+						message: 'Project not found'
+					}
+				};
+			}
+			const project_id = deleted_proj[0].id;
+
+			await deploymentManager.stopProject({ project_id });
+			await sourceManager.deleteProject({ project_id });
+		});
 
 		return {
 			success: true,

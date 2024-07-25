@@ -20,8 +20,6 @@ Deplauto is an open source self hosted alternative to Vercel or Heroku. It allow
 
 [ ] Configuring Healthcheck Settings (Expected Body and Status Code)
 
-[ ] Deleting Projects
-
 [ ] Modifying Project Settings
 
 [ ] Prevent Multiple Projects on same Domain and Port
@@ -35,6 +33,7 @@ Deplauto is an open source self hosted alternative to Vercel or Heroku. It allow
 ### Done
 
 [x] Healthchecks
+[x] Deleting Projects
 
 ## Installation
 

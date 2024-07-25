@@ -18,6 +18,12 @@ export const projects = pgTable('projects', {
 	healthcheck_url: varchar('healthcheck_url').notNull()
 });
 
+export const project_env_variables = pgTable('project_env_variables', {
+	key: varchar('key').notNull(),
+	value: varchar('value').notNull(),
+	project_id: integer('project_id').references(() => projects.id)
+});
+
 export const deployments = pgTable('deployments', {
 	id: serial('id').primaryKey(),
 	project_id: integer('project_id').references(() => projects.id),

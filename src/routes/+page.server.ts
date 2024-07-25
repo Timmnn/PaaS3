@@ -1,7 +1,6 @@
-import { getTRPCClient } from '$lib/tRPCClient';
+import { trpc } from '$lib/tRPCClient';
 
 export async function load(event) {
-	const trpc = getTRPCClient(event.url.origin);
 	const response = await trpc.getProjects.query();
 
 	console.log('a');

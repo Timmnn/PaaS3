@@ -160,7 +160,7 @@ const createProject = publicProcedure
 				| 'project_source'
 				| 'healthcheck_url'
 				| 'build_command'
-			>
+			> & { env_variables: { key: string; value: string }[] }
 		>()
 	)
 	.mutation(async (opts) => {
@@ -174,37 +174,44 @@ const createProject = publicProcedure
 				}
 			};
 		}
+		let project: InferSelectModel<typeof schema.projects>;
 
-		let project;
-		try {
-			project = (
-				await db
-					.insert(schema.projects)
-					.values({
-						description: opts.input.description,
-						domain: opts.input.domain,
-						git_repo_url: opts.input.git_repo_url,
-						name: opts.input.name,
-						project_source: opts.input.project_source,
-						healthcheck_url: opts.input.healthcheck_url,
-						build_command: opts.input.build_command
-					})
-					.returning()
-			)[0];
-		} catch (e) {
-			console.error('Failed to create project', e);
-			return {
-				success: false,
-				error: {
-					code: 500,
-					message: 'Failed to create project'
-				}
-			};
-		}
+		await db.transaction(async (tx) => {
+			try {
+				project = (
+					await db
+						.insert(schema.projects)
+						.values({
+							description: opts.input.description,
+							domain: opts.input.domain,
+							git_repo_url: opts.input.git_repo_url,
+							name: opts.input.name,
+							project_source: opts.input.project_source,
+							healthcheck_url: opts.input.healthcheck_url,
+							build_command: opts.input.build_command
+						})
+						.returning()
+				)[0];
+			} catch (e) {
+				console.error('Failed to create project', e);
+				return {
+					success: false,
+					error: {
+						code: 500,
+						message: 'Failed to create project'
+					}
+				};
+			}
+
+			const env_variables = opts.input.env_variables.map((env) => ({
+				...env,
+				project_id: project.id
+			}));
+
+			await db.insert(schema.project_env_variables).values(env_variables);
+		});
 
 		let deployment;
-
-		console.log('created project', project);
 
 		const source_folder = await sourceManager.pullSource({
 			type: 'public-git',

@@ -17,18 +17,20 @@
 		trpc.startProject.mutate(data.project.id).then((res) => {
 			if (!res.success) {
 				console.error(res.error);
-				showAlert('project_failed_to_start');
+				showAlert('Project could not be started', 'red');
 				return;
 			}
-
-			showAlert('project_started');
 		});
+
+		showAlert('Project started', 'green');
 	}
 
-	let visible_alert = '';
-
-	function showAlert(alert_name: string) {
-		visible_alert = alert_name;
+	function showAlert(alert_message: string, alert_color: 'green' | 'red') {
+		alert = {
+			color: alert_color,
+			message: alert_message,
+			visible: true
+		};
 		setTimeout(() => {
 			//hideAlert();
 		}, 3000);
@@ -38,28 +40,44 @@
 		if (e) {
 			e.preventDefault();
 		}
-		visible_alert = '';
+
+		alert.visible = false;
 	}
 
 	function deleteProject() {
 		trpc.deleteProject.mutate(data.project.id).then((res) => {
 			if (!res.success) {
+				showAlert('Project could not be deleted', 'red');
 				console.error(res.error);
 				return;
 			}
+
+			showAlert('Project deleted', 'green');
 
 			window.location.href = '/';
 		});
 	}
 
 	let deleteProjectModalOpen = false;
+
+	let alert = {
+		color: 'green',
+		message: '',
+		visible: false
+	} as {
+		color: 'green' | 'red';
+		message: string;
+		visible: boolean;
+	};
+
+	function openSite() {
+		window.open('http://' + data.project.domain, '_blank');
+	}
 </script>
 
 <h1>Project: "{data.project.name}"</h1>
 
 Description: {data.project.description}
-
-Domain: <a href={'https://' + data.project.domain}>{data.project.domain}</a>
 
 RUNNING: {data.project.health === 'running' ? 'YES' : 'NO'}
 
@@ -78,13 +96,12 @@ RUNNING: {data.project.health === 'running' ? 'YES' : 'NO'}
 	</Modal>
 
 	<Alert
-		open={visible_alert === 'project_started'}
+		open={alert.visible}
 		on:close={hideAlert}
-		alertProps={{ border: true, color: 'green' }}>Project Started</Alert
+		alertProps={{ border: true, color: alert.color }}
 	>
-	<Alert open={visible_alert === 'project_failed_to_start'} on:close={hideAlert}
-		>Failed to start project</Alert
-	>
+		{alert.message}
+	</Alert>
 	<ButtonGroup class="*:!ring-primary-700">
 		<Button on:click={start} color="dark" size="xl">
 			<PlaySolid class="me-2 h-4 w-4" />
@@ -98,5 +115,6 @@ RUNNING: {data.project.health === 'running' ? 'YES' : 'NO'}
 			<TrashBinSolid class="me-2 h-4 w-4" />
 			Delete
 		</Button>
+		<Button color="dark" on:click={openSite}>Open site</Button>
 	</ButtonGroup>
 </div>

@@ -3,9 +3,11 @@ import { publicProcedure } from '../router';
 import type { ApiResponse, ProjectWithHealth } from '../types';
 import getProjectHealthFunction from '../../lib/getProjectHealthFunction';
 import * as schema from '../../drizzle/schema';
+import logger from '../../lib/Logging';
 
 type GetProjectsResponse = ProjectWithHealth[];
 const getProjects = publicProcedure.query(async (): ApiResponse<GetProjectsResponse> => {
+	logger.info('getProjects', { meta: { route: 'getProjects' } });
 	const db = await useDb();
 	if (!db) {
 		return {
@@ -16,8 +18,6 @@ const getProjects = publicProcedure.query(async (): ApiResponse<GetProjectsRespo
 			}
 		};
 	}
-
-	console.log('getting projects');
 
 	const projects = await db.select().from(schema.projects);
 
@@ -32,7 +32,7 @@ const getProjects = publicProcedure.query(async (): ApiResponse<GetProjectsRespo
 		health: healthchecksResolved[project.id]
 	}));
 
-	console.log('projects_with_health', projects_with_health);
+	logger.info('All Projects including health', { meta: { projects_with_health } });
 
 	return {
 		success: true,

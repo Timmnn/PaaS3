@@ -12,6 +12,8 @@
 		{ key: 'key1', value: 'value1' },
 		{ key: 'key2', value: 'value2' }
 	] as { key: string; value: string }[];
+	let dockerComposeConfigLocation = 'docker-compose.yml';
+	let exposedPort = 80;
 
 	let error = null as string | null;
 
@@ -25,7 +27,9 @@
 			project_source: 'public-git',
 			healthcheck_url: healthcheckUrl,
 			build_command: '',
-			env_variables: environmentVariables
+			env_variables: environmentVariables,
+			docker_compose_config_location: dockerComposeConfigLocation,
+			exposed_port: exposedPort
 		});
 	}
 
@@ -80,6 +84,14 @@
 				<Label for="domain">Domain</Label>
 				<Input id="domain" size="md" placeholder="docker-compose-example.com" bind:value={domain} />
 
+				<Label for="docker-compose-config-location">Docker Compose Config Location</Label>
+				<Input
+					id="docker-compose-config-location"
+					size="md"
+					placeholder="docker-compose.yml"
+					bind:value={dockerComposeConfigLocation}
+				/>
+
 				<Label for="healthcheck-url">Healthcheck Url</Label>
 				<Input
 					id="healthcheck-url"
@@ -87,6 +99,9 @@
 					placeholder="/healthcheck"
 					bind:value={healthcheckUrl}
 				/>
+
+				<Label for="exposed-port">Exposed Port</Label>
+				<Input id="exposed-port" size="md" placeholder="80" disabled bind:value={exposedPort} />
 			</div>
 		</TabItem>
 		<TabItem>

@@ -11,28 +11,42 @@ export default class SourceManager {
 	// sourceUrl: URL to the source (git repo, zip file, etc)
 	async pullSource({
 		type,
-		sourceUrl,
+		source,
 		project_id
 	}: {
 		type: project_sources;
-		sourceUrl: string;
+		source: string;
 		project_id: number;
 	}) {
 		const dirName = this.getDirName({ project_id });
 		if (!fs.existsSync(dirName)) {
 			fs.mkdirSync(dirName);
 		}
-		console.log('pulling source', sourceUrl, 'to', dirName, 'of type', type);
+
 		switch (type) {
 			case 'public-git':
 				console.log('pulling git repo');
-				await this.pullGit({ dirName, sourceUrl });
+				await this.pullGit({ dirName, sourceUrl: source });
+				break;
+			case 'docker-compose':
+				this.pullDockerCompose({ dirName, config: source });
+				break;
+			case 'dockerfile':
+				this.pullDockerfile({ dirName, config: source });
 				break;
 			default:
 				throw new Error('Unsupported source type');
 		}
 
 		return dirName;
+	}
+
+	private pullDockerfile({ dirName, config }: { dirName: string; config: string }) {
+		fs.writeFileSync(`${dirName}/Dockerfile`, config);
+	}
+
+	private pullDockerCompose({ dirName, config }: { dirName: string; config: string }) {
+		fs.writeFileSync(`${dirName}/docker-compose.yml`, config);
 	}
 
 	getDirName({ project_id }: { project_id: number }) {

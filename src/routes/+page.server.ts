@@ -3,12 +3,7 @@ import { trpc } from '$lib/tRPCClient';
 export async function load(event) {
 	const response = await trpc.getProjects.query();
 
-	console.log('a');
-	if (!response.success) {
-		console.log('a1', response.error);
-		throw new Error(response.error.message);
-	}
-	console.log('b');
+	if (!response.success) throw new Error(response.error.message);
 
 	const projects = response.data;
 	const projects_with_health = projects as ((typeof projects)[0] & {
@@ -23,8 +18,6 @@ export async function load(event) {
 
 		project.health = healthcheck_response.data;
 	}
-
-	console.log(projects);
 
 	return {
 		projects: projects_with_health

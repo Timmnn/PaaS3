@@ -11,6 +11,11 @@
 			label: 'Docker Compose',
 			name: 'docker-compose',
 			description: 'Create a project from a docker-compose.yml file'
+		},
+		{
+			label: 'Dockerfile',
+			name: 'dockerfile',
+			description: 'Create a project from a Dockerfile'
 		}
 	];
 </script>

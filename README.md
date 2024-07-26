@@ -30,10 +30,15 @@ Deplauto is an open source self hosted alternative to Vercel or Heroku. It allow
 
 [ ] Premade Services
 
+[ ] Custom docker compose location
+
+[ ] Custom Exposed Port
+
 ### Done
 
 [x] Healthchecks
 [x] Deleting Projects
+[x] Project by Dockerfile
 
 ## Installation
 

@@ -9,6 +9,7 @@ import startProject from './routes/startProject';
 import deleteProject from './routes/deleteProject';
 import { router, createContext } from './router';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
+import logger from '../lib/Logging';
 
 const appRouter = router({
 	getProject,
@@ -35,5 +36,5 @@ app.use(
 );
 
 app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
+	logger.info(`Server is running on port ${PORT}`);
 });

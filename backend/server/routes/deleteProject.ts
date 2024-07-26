@@ -3,7 +3,7 @@ import { useDb } from '../../lib/useDB';
 import { publicProcedure } from '../router';
 import SourceManager from '../../lib/SourceManager';
 import DeploymentManager from '../../lib/DeploymentManager';
-import { ApiResponse } from '../types';
+import type { ApiResponse } from '../types';
 import * as schema from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
 
@@ -13,7 +13,6 @@ const deploymentManager = new DeploymentManager();
 const deleteProject = publicProcedure
 	.input(z.number().refine((id) => id > 0, { message: 'Invalid project id' }))
 	.mutation(async (opts): ApiResponse<void> => {
-		console.log('deleteProject');
 		const db = await useDb();
 		if (!db) {
 			return {

@@ -5,8 +5,6 @@ dotenv.config({
 	path: '../../.env'
 });
 
-console.log('ENV', process.env.PRIVATE_POSTGRES_USER);
-
 export default defineConfig({
 	dialect: 'postgresql',
 	schema: 'schema.ts',

@@ -4,29 +4,36 @@ import { publicProcedure } from '../router';
 import * as schema from '../../drizzle/schema';
 import { type InferSelectModel } from 'drizzle-orm';
 import SourceManager from '../../lib/SourceManager';
-import NginxManager from '../../lib/NginxManager';
+import DeploymentManager from '../../lib/DeploymentManager';
 
 const sourceManager = new SourceManager();
-const nginxManager = new NginxManager();
-
+const deploymentManager = new DeploymentManager();
 const createProject = publicProcedure
 	.input(
+		//TODO: this type sucks (it's too long)
 		z.custom<
 			Pick<
 				InferSelectModel<typeof schema.projects>,
 				| 'description'
 				| 'domain'
-				| 'git_repo_url'
 				| 'name'
 				| 'project_source'
 				| 'healthcheck_url'
 				| 'build_command'
-			> & { env_variables: { key: string; value: string }[] }
+				| 'exposed_port'
+			> & {
+				env_variables: { key: string; value: string }[];
+				docker_compose_config?: string;
+				git_repo_url?: string;
+				docker_compose_config_location?: string;
+				dockerfile_content?: string;
+			}
 		>()
 	)
 	.mutation(async (opts) => {
 		const db = await useDb();
 		if (!db) {
+			console.error('Failed to connect to database');
 			return {
 				success: false,
 				error: {
@@ -42,15 +49,21 @@ const createProject = publicProcedure
 				project = (
 					await db
 						.insert(schema.projects)
-						.values({
-							description: opts.input.description,
-							domain: opts.input.domain,
-							git_repo_url: opts.input.git_repo_url,
-							name: opts.input.name,
-							project_source: opts.input.project_source,
-							healthcheck_url: opts.input.healthcheck_url,
-							build_command: opts.input.build_command
-						})
+						.values([
+							{
+								description: opts.input.description,
+								domain: opts.input.domain,
+								git_repo_url: opts.input.git_repo_url,
+								name: opts.input.name,
+								project_source: opts.input.project_source,
+								healthcheck_url: opts.input.healthcheck_url,
+								build_command: opts.input.build_command,
+								docker_compose_config: opts.input.docker_compose_config,
+								docker_compose_config_location: opts.input.docker_compose_config_location,
+								exposed_port: opts.input.exposed_port,
+								dockerfile_content: opts.input.dockerfile_content
+							}
+						])
 						.returning()
 				)[0];
 			} catch (e) {
@@ -69,17 +82,37 @@ const createProject = publicProcedure
 				project_id: project.id
 			}));
 
-			await db.insert(schema.project_env_variables).values(env_variables);
+			if (env_variables.length > 0) {
+				await db.insert(schema.project_env_variables).values(env_variables);
+			}
 
 			let deployment;
 
-			const source_folder = await sourceManager.pullSource({
-				type: 'public-git',
-				sourceUrl: opts.input.git_repo_url,
+			const source = (opts.input.git_repo_url ||
+				opts.input.docker_compose_config ||
+				opts.input.dockerfile_content) as string;
+
+			if (!source) {
+				console.error('No source provided');
+				return {
+					success: false,
+					error: {
+						code: 400,
+						message: 'No source provided'
+					}
+				};
+			}
+
+			await sourceManager.pullSource({
+				type: project.project_source,
+				source,
 				project_id: project.id
 			});
 
-			await nginxManager.updateNginxConfig(await db.select().from(schema.deployments));
+			await deploymentManager.deployProject(
+				project,
+				sourceManager.getDirName({ project_id: project.id })
+			);
 
 			return {
 				success: true,

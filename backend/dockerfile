@@ -31,4 +31,8 @@ RUN curl -fsSL https://bun.sh/install | bash && \
 
 RUN bun install
 
+# Build the project
+
+RUN bun build
+
 CMD ["node", "build/main.js"]

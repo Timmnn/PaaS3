@@ -1,1 +1,0 @@
-npx ts-json-schema-generator --path './type.ts' --type 'TYPENAME' > './schema.json'

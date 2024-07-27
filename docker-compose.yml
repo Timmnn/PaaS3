@@ -2,6 +2,10 @@
 
 version: '3.7'
 
+networks:
+  admin_ui:
+    driver: bridge
+
 volumes:
   db_docker_volume:
 services:
@@ -35,3 +39,23 @@ services:
     image: traefik/whoami
     labels:
       - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
+  admin_ui:
+    build: .
+    ports:
+      - "3000:3000"
+    networks:
+      - admin_ui
+  nginx:
+    image: nginx:latest
+    ports:
+      - "9000:80"
+    volumes:
+      - ./nginx:/etc/nginx/nginx.conf
+    networks:
+      - admin_ui
+  backend:
+    build: ./backend/
+    ports: 
+      - "3001:3001"
+    networks:
+      - admin_ui

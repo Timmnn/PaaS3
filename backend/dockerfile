@@ -33,6 +33,6 @@ RUN bun install
 
 # Build the project
 
-RUN bun build
+RUN bun build --target=node --outdir build/ server/main.ts
 
 CMD ["node", "build/main.js"]

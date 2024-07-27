@@ -40,7 +40,7 @@ services:
     labels:
       - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
   admin_ui:
-    build: .
+    build: ./frontend
     ports:
       - "3000:3000"
     networks:
@@ -50,11 +50,11 @@ services:
     ports:
       - "9000:80"
     volumes:
-      - ./nginx:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     networks:
       - admin_ui
   backend:
-    build: ./backend/
+    build: ./backend
     ports: 
       - "3001:3001"
     networks:

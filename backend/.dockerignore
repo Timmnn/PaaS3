@@ -1,0 +1,3 @@
+db_docker_volume/
+deployments/*
+node_modules/

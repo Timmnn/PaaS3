@@ -2,6 +2,9 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+WORKDIR /app
+
+
 # Install dependencies
 RUN apt-get update && apt-get install -y curl unzip
 
@@ -16,11 +19,9 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | b
 # throw error if node version is <20
 RUN . ~/.nvm/nvm.sh && node -v | grep -q "v20" || (echo "Node version is less than 20" && exit 1)
 
-WORKDIR /app
 
 COPY . .
 
-RUN ls -la
 
 
 # Install bun and add it to the PATH

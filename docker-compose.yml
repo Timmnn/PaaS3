@@ -16,10 +16,13 @@ services:
       POSTGRES_PASSWORD: ${PRIVATE_POSTGRES_PASSWORD}
       POSTGRES_DB: ${PRIVATE_POSTGRES_DB}
       POSTGRES_PORT: ${PRIVATE_POSTGRES_PORT}
+      
     ports:
       - "5432:5432"
     volumes:
       - ./backend/db_docker_volume:/var/lib/postgresql/data
+    networks:
+      - admin_ui
   reverse-proxy:
     # The official v3 Traefik docker image
     image: traefik:v3.1
@@ -50,7 +53,7 @@ services:
     ports:
       - "9000:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx.conf:/etc/nginx/nginx.conf
     networks:
       - admin_ui
   backend:
@@ -59,3 +62,5 @@ services:
       - "3001:3001"
     networks:
       - admin_ui
+    env_file:
+      - backend/.env

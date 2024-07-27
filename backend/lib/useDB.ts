@@ -10,6 +10,7 @@ async function useDb(): Promise<ReturnType<typeof drizzle> | null> {
    const maybeDb = await connectToDb();
 
    if (maybeDb instanceof Error) {
+      console.error("Failed to connect to database:", maybeDb);
       return null;
    }
 

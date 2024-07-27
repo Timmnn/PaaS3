@@ -21,6 +21,15 @@ RUN . ~/.nvm/nvm.sh && node -v | grep -q "v20" || (echo "Node version is less th
 
 
 COPY . .
+COPY ./.env .
+
+# set env variables in .env file
+RUN export $(grep -v '^#' .env | xargs)
+ENV PRIVATE_POSTGRES_USER=${PRIVATE_POSTGRES_USER}
+ENV PRIVATE_POSTGRES_PASSWORD=${PRIVATE_POSTGRES_PASSWORD}
+ENV PRIVATE_POSTGRES_DB=${PRIVATE_POSTGRES_DB}
+ENV PRIVATE_POSTGRES_PORT=${PRIVATE_POSTGRES_PORT}
+
 
 
 

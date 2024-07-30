@@ -1,7 +1,3 @@
-# Start db and nginx
-
-version: '3.7'
-
 networks:
   admin_ui_network:
     driver: bridge

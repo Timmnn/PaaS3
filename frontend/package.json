@@ -37,7 +37,8 @@
   "type": "module",
   "dependencies": {
     "@sveltejs/adapter-node": "^5.2.0",
-    "@trpc/client": "^11.0.0-rc.466",
+    "@trpc/client": "11.0.0-rc.467",
+    "dotenv": "^16.4.5",
     "winston": "^3.13.1"
   }
 }

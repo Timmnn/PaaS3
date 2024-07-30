@@ -10,9 +10,6 @@ import deleteProject from "./routes/deleteProject";
 import { router, createContext } from "./router";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import logger from "../lib/Logging";
-import { useDb } from "../lib/useDB";
-
-const db = useDb();
 
 const appRouter = router({
    getProject,

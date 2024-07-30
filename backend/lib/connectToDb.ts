@@ -8,7 +8,13 @@ import { config } from "dotenv";
 config({
    path: "../.env",
 });
-const { PRIVATE_POSTGRES_USER, PRIVATE_POSTGRES_PASSWORD, PRIVATE_POSTGRES_DB } = process.env;
+const {
+   PRIVATE_POSTGRES_USER,
+   PRIVATE_POSTGRES_PASSWORD,
+   PRIVATE_POSTGRES_DB,
+   PRIVATE_POSTGRES_HOST,
+   PRIVATE_POSTGRES_PORT,
+} = process.env as Record<string, string>;
 
 async function _connectToDb(): Promise<{
    db: ReturnType<typeof drizzle>;
@@ -17,8 +23,8 @@ async function _connectToDb(): Promise<{
    console.log(PRIVATE_POSTGRES_USER, PRIVATE_POSTGRES_PASSWORD, PRIVATE_POSTGRES_DB, process.env);
 
    const client = new Client({
-      host: "db",
-      port: 5432,
+      host: PRIVATE_POSTGRES_HOST,
+      port: parseInt(PRIVATE_POSTGRES_PORT),
       user: PRIVATE_POSTGRES_USER,
       password: PRIVATE_POSTGRES_PASSWORD,
       database: PRIVATE_POSTGRES_DB,

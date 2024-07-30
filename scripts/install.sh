@@ -1,7 +1,7 @@
 touch ./backend/.env
 # write .env.example to .env
 
-cat ./backend/.env.example > ./backend/.env
+cat .env.example > .env
 
 
 npm i -g drizzle-kit

@@ -46,6 +46,8 @@ services:
       - "3000:3000"
     networks:
       - admin_ui_network
+    environment:
+      - API_HOST=backend
   nginx:
     image: nginx:latest
     ports:

@@ -40,7 +40,7 @@ services:
     image: traefik/whoami
     labels:
       - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
-  admin_ui_frontend:
+  admin_ui:
     build: ./frontend
     ports:
       - "3000:3000"

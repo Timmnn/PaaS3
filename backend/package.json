@@ -21,6 +21,7 @@
     "@types/js-yaml": "^4.0.9",
     "body-parser": "^1.20.2",
     "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.23.1",
     "drizzle-orm": "^0.32.1",
     "express": "^4.19.2",
     "js-yaml": "^4.1.0",

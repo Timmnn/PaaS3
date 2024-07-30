@@ -47,7 +47,7 @@ services:
     networks:
       - admin_ui_network
     environment:
-      - API_HOST=backend
+      - API_HOST=backend:3001
   nginx:
     image: nginx:latest
     ports:
@@ -64,3 +64,5 @@ services:
       - admin_ui_network
     env_file:
       - .env
+    environment:
+      - PRIVATE_POSTGRES_HOST=db

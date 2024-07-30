@@ -1,11 +1,14 @@
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
-import createProjectCommand from "./commands/createproject";
+import { InteractiveCommand } from "interactive-commander";
+import createProjectCommand from "./commands/create-project";
 
-yargs(hideBin(process.argv))
-   .demandCommand(1, "must provide a valid command")
-   .help("h")
-   .strict()
-   .alias("h", "help");
+(async () => {
+   const program = new InteractiveCommand();
 
-createProjectCommand(yargs);
+   program.name("Deplauto CLI").description("Z").version("0.8.0");
+
+   createProjectCommand(program);
+
+   await program
+      .interactive("-I, --no-interactive", "disable interactive mode")
+      .parseAsync(process.argv);
+})();

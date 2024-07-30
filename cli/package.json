@@ -16,6 +16,7 @@
     "@types/yargs-interactive": "^2.1.6",
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
+    "interactive-commander": "^0.5.183",
     "pino": "^9.3.2",
     "typescript": "^5.5.4",
     "yargs": "^17.7.2",
